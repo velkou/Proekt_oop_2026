@@ -23,10 +23,10 @@ void CommandCenter::run()
         {
             if (command == "generate")
             {
-                unsigned n, m;
+                int n, m;
                 std::cin >> n >> m;
 
-                if (n == 0 || m == 0)
+                if (n <= 0 || m <= 0)
                     throw std::invalid_argument("City dimensions must be at least 1x1!");
 
                 if (std::cin.fail())
@@ -34,11 +34,11 @@ void CommandCenter::run()
                     clearInputStream();
                     throw std::invalid_argument("Coordinates must be positive numbers!");
                 }
-                map.generate(n, m);
+                map.generate((unsigned)n,(unsigned) m);
             }
             else if (command == "add")
             {
-                unsigned x,y,happiness,money,life;
+                int x,y,happiness,money,life;
                 std::string name, job;
                 std::cin >> x >> y >> name >> job >> happiness >> money >> life;
 
@@ -49,8 +49,13 @@ void CommandCenter::run()
                 }
 
                 //validacii
-                if (happiness > 100 || life > 100)
+                if (x <= 0 || y <= 0)
+                    throw std::invalid_argument("Coordinates cannot be negative numbers!");
+                if (happiness < 0 || happiness > 100 || life > 100 || life < 0)
                     throw std::invalid_argument("Happiness and life points must be between 0 and 100!");
+
+                if (money < 0)
+                    throw std::invalid_argument("Money cannot be a negative number!");
 
                 //suzdavame si profesiq
                 Profession* prof = createProfessionFromString(job);
@@ -64,6 +69,10 @@ void CommandCenter::run()
                 //dobavqme go v grada
                 try
                 {
+                    ///Ако addCitizen хвърли грешка (например "Сградата е пълна"),
+                    ///твоят try-catch улавя грешката,
+                    ///изтрива заделената памет за новия човек,
+                    ///за да няма Memory Leak, и препраща грешката нагоре.
                     map.addCitizen(x,y,newCitizen);
                     std::cout << "Citizen " << name << " added successfully!" << std::endl;
                 }
@@ -75,7 +84,7 @@ void CommandCenter::run()
             }
             else if (command == "remove")
             {
-                unsigned x,y;
+                int x,y;
                 std::string name;
 
                 std::cin >> x >> y >> name;
@@ -84,8 +93,10 @@ void CommandCenter::run()
                     clearInputStream();
                     throw std::invalid_argument("Invalid input for remove!");
                 }
+                if (x <= 0 || y <= 0)
+                    throw std::invalid_argument("Coordinates cannot be negative numbers");
 
-                map.removeCitizen(x,y,name);
+                map.removeCitizen((unsigned)x,(unsigned)y,name);
                 std::cout << "Citizen removed successfully!" << std::endl;
             }
             else if (command == "step")
@@ -138,7 +149,7 @@ void CommandCenter::run()
                 else
                 {
                     //sus sigurnost imame koordinati i gi chetem
-                    unsigned x,y;
+                    int x,y;
                     std::cin >> x >> y;
 
                     if (std::cin.fail())
@@ -146,6 +157,10 @@ void CommandCenter::run()
                         clearInputStream();
                         throw std::invalid_argument("Invalid coordinates for info command!");
                     }
+
+                    if (x <= 0 || y <= 0)
+                        throw std::invalid_argument("Coordinates cannot be negative numbers!");
+
 
                     while (std::cin.peek() == ' ' || std::cin.peek() == '\t')
                         std::cin.get();
@@ -169,7 +184,7 @@ void CommandCenter::run()
                         }
 
                         while (std::cin.get() != '\n' && !std::cin.eof()) {} // izchistvame vsichko ostanalo ot reda vkluchitelno i '\n' za da e chist bufera
-                        map.printCitizenInfo(x,y,name);
+                        map.printCitizenInfo((unsigned)x,(unsigned)y,name);
                     }
                 }
             }
