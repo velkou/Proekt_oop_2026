@@ -77,16 +77,11 @@ void Cell::save(std::ofstream& out) const
 {
     //zapazvane na sgradata
     if (building == nullptr)
-        BinaryUtils::writeString(out,"None");
+        BinaryUtils::writePrimitive(out,BuildingType::None);
     else
     {
-        //kakto v statistikata razpoznavame tipa
-        std::string type = "Unknown";
-        if (dynamic_cast<const ModernBuilding*>(building)) type = "Modern";
-        else if (dynamic_cast<const Panel*>(building)) type = "Panel";
-        else if (dynamic_cast<const Dorm*>(building)) type = "Dorm";
-
-        BinaryUtils::writeString(out,type); //purvo zapisvame tipa
+        // direktno zapisvame enuma kato chislo, koeto e po memory eficient, zashtoto sega enuma e samo 4 byte-a
+        BinaryUtils::writePrimitive(out,building->getType());
         building->save(out); //sled tova samata sgradata si zapisva chislata
     }
 
@@ -101,7 +96,8 @@ void Cell::save(std::ofstream& out) const
 void Cell::load(std::ifstream& in)
 {
     //zarejdane na sgrada
-    std::string bldgType = BinaryUtils::readString(in);
+    BuildingType type;
+    BinaryUtils::readPrimitive(in,type);
 
     //chistim starata sgrada, ako prezapisvame kletkata
     if (building != nullptr)
@@ -109,15 +105,19 @@ void Cell::load(std::ifstream& in)
         delete building;
         building = nullptr;
     }
-    if (bldgType != "None")
-    {
-        //podavame vremenen kapacitet 0, zashtoto load() vednaga shte go prezapishe s tozi ot faila
-        if (bldgType == "Modern") building = new ModernBuilding(0);
-        else if (bldgType == "Panel") building = new Panel(0);
-        else if (bldgType == "Dorm") building = new Dorm(0);
 
-        if (building != nullptr)
-            building->load(in);
+    if (type != BuildingType::None)
+    {
+        switch (type)
+        {
+            case BuildingType::Modern: building = new ModernBuilding(0); break;
+            case BuildingType::Panel: building = new Panel(0); break;
+            case BuildingType::Dorm: building = new Dorm(0); break;
+            default:
+                throw std::runtime_error("Corrupt file: Invalid building type!");
+        }
+        //tuk sme sigurni che building sochi kum sushtestvuvashta sgrada
+        building->load(in);
     }
 
     //zarejdane na grajdanite

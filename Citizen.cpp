@@ -107,12 +107,12 @@ void Citizen::save(std::ofstream& out) const
     BinaryUtils::writePrimitive(out,money);
     BinaryUtils::writePrimitive(out,lifePoints);
 
-    //zapisvame profesiqta kato string
-    std::string profName = "None";
+    //zapisvame profesiqta kato enum
+    ProfessionType type = ProfessionType::None;
     if (prof != nullptr)
-        profName = getProfession();
+        type = prof->getType(); ///a kakvo e getProfessionName() ?
 
-    BinaryUtils::writeString(out,profName);
+    BinaryUtils::writePrimitive(out,type);
 
     //zapisvame istoriqta
     size_t histSize = history.size();
@@ -130,7 +130,8 @@ void Citizen::load(std::ifstream& in)
     BinaryUtils::readPrimitive(in,lifePoints);
 
     //vuzstanovqvame profesiqta
-    std::string profName = BinaryUtils::readString(in);
+    ProfessionType type;
+    BinaryUtils::readPrimitive(in,type);
 
     if (prof != nullptr)
     {
@@ -138,11 +139,19 @@ void Citizen::load(std::ifstream& in)
         prof = nullptr;
     }
 
-    if (profName == "Teacher") prof = new Teacher();
-    else if (profName == "Programmer") prof = new Programmer();
-    else if (profName == "Miner") prof = new Miner();
-    else if (profName == "Student") prof = new Student();
-    else if (profName == "Unemployed") prof = new Unemployed();
+    if (type != ProfessionType::None)
+    {
+        switch (type)
+        {
+            case ProfessionType::Miner: prof = new Miner(); break;
+            case ProfessionType::Teacher: prof = new Teacher(); break;
+            case ProfessionType::Student: prof = new Student(); break;
+            case ProfessionType::Programmer: prof = new Programmer(); break;
+            case ProfessionType::Unemployed: prof = new Unemployed(); break;
+            default:
+                throw std::runtime_error("Corrupt file: Invalid profession!");
+        }
+    }
 
     //vuzstanovqvame istoriqta
     size_t histSize = 0;

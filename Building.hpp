@@ -1,5 +1,6 @@
 #pragma once
 #include "Citizen.hpp"
+#include "Enums.hpp"
 
 class Building {
 public:
@@ -17,6 +18,8 @@ public:
     unsigned getMaxCap() const { return maxCap; }
 
     virtual Building* clone() const = 0;
+
+    virtual BuildingType getType() const = 0;
 
     //virtualni zashtoto tipovete sgradi sa polimorfni tipove i zashtoto kato zarejdame faila
     //programata trqbva da znae dali tezi chisla prinadlejat na panelka ili obshtak

@@ -11,6 +11,8 @@ public:
         unsigned n, unsigned m) override;
 
     Building* clone() const override { return new Dorm(*this); }
+
+    BuildingType getType() const override { return BuildingType::Dorm; }
 };
 
 inline void Dorm::applyBuildingEffect(std::vector<Citizen*>& currentCitizens, unsigned dayOfMonth, const std::string& currentDate, unsigned distanceFromCenter,

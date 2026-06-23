@@ -25,4 +25,5 @@ add_executable(proekt main.cpp
         CityMap.hpp
         CommandCenter.cpp
         CommandCenter.hpp
+        Enums.hpp
 )

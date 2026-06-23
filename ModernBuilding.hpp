@@ -10,6 +10,8 @@ public:
         unsigned n, unsigned m) override;
 
     Building* clone() const override { return new ModernBuilding(*this); }
+
+    BuildingType getType() const override { return BuildingType::Modern; }
 };
 
 inline void ModernBuilding::applyBuildingEffect(std::vector<Citizen*>& currentCitizens, unsigned dayOfMonth, const std::string& currentDate,

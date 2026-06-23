@@ -7,4 +7,6 @@ public:
     bool canLiveInDorm() const override { return false; }
     Profession* clone() const override { return new Unemployed(*this); }
     void applyMonthlyEffects(Citizen& citizen) const override;
+
+    ProfessionType getType() const override { return ProfessionType::Unemployed; }
 };

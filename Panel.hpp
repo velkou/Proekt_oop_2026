@@ -10,6 +10,8 @@ public:
         unsigned n, unsigned m) override;
 
     Building* clone() const override { return new Panel(*this); }
+
+    BuildingType getType() const override { return BuildingType::Panel; }
 };
 
 inline void Panel::applyBuildingEffect(std::vector<Citizen*>& currentCitizens, unsigned dayOfMonth, const std::string& currentDate, unsigned distanceFromCenter,
