@@ -194,9 +194,19 @@ void CityMap::printCityInfo() const
     {
         for (size_t j = 0; j < m; ++j)
         {
-            if (grid[i][j].getBuilding() == nullptr) continue;
+            //vzimame sgradata
+            const Building* bldg = grid[i][j].getBuilding();
+            if (bldg == nullptr) continue;
 
             if (!printLine("Location [" + std::to_string(i) + "][" + std::to_string(j) + "]",lines)) return;
+
+            //razpoznavame i printirame tipa na sgradata
+            std::string bldgType = "Unknown building";
+            if (dynamic_cast<const ModernBuilding*>(bldg)) bldgType = "Modern Building";
+            else if (dynamic_cast<const Panel*>(bldg)) bldgType = "Panel";
+            else if (dynamic_cast<const Dorm*>(bldg)) bldgType = "Dorm";
+
+            if (!printLine(bldgType + ":",lines)) return;
 
             for (Citizen* c : grid[i][j].getCitizens())
             {
@@ -218,7 +228,10 @@ void CityMap::printLocationInfo(unsigned x, unsigned y) const
     unsigned lines = 0;
     const Cell& target = grid[x][y];
 
-    if (target.getBuilding() == nullptr)
+    //vzimame sgradata za po-udobno
+    const Building* bldg = target.getBuilding();
+
+    if (bldg == nullptr)
     {
         std::cout << "Location [" + std::to_string(x) + "][" + std::to_string(y) + "] is empty." << std::endl;
         return;
@@ -226,10 +239,16 @@ void CityMap::printLocationInfo(unsigned x, unsigned y) const
 
     if (!printLine("Location [" + std::to_string(x) + "][" + std::to_string(y) + "]",lines)) return;
 
+    std::string bldgType = "Unknown";
+    if (dynamic_cast<const ModernBuilding*>(bldg)) bldgType = "Modern Building";
+    else if (dynamic_cast<const Panel*>(bldg)) bldgType = "Panel";
+    else if (dynamic_cast<const Dorm*>(bldg)) bldgType = "Dorm";
+
     //otpechatvame broq na horata i kapaciteta
-    std::string bldgInfo = "Capacity: " + std::to_string(target.getBuilding()->getMaxCap()) +
-                            "/Free spaces: " + std::to_string(target.getBuilding()->getMaxCap() - target.getCitizens().size()) +
-                            "/Base rent: " + std::to_string(target.getBuilding()->getBaseRent());
+    std::string bldgInfo =  "Type: " + bldgType +
+        "/Base rent: " + std::to_string(bldg->getBaseRent()) +
+        "/Capacity: " + std::to_string(bldg->getMaxCap()) +
+        "/Free spaces: " + std::to_string(bldg->getMaxCap() - target.getCitizens().size());
 
     if (!printLine(bldgInfo,lines)) return;
 
@@ -611,9 +630,7 @@ void CityMap::loadFromFile(const std::string& filename)
 
 bool CityMap::printLine(const std::string& text, unsigned& lineCounter, unsigned maxLines) const
 {
-    std::cout << text << std::endl;
-    lineCounter++;
-
+    //proverqvame dali sme stignali limita (tova oznachava, che idva red za nova stranica)
     if (lineCounter >= maxLines)
     {
         std::cout << "Press [Enter] to continue or 'q' to quit!";
@@ -625,6 +642,11 @@ bool CityMap::printLine(const std::string& text, unsigned& lineCounter, unsigned
 
         lineCounter = 0; //nulirame broqcha za sledvashtata stranica
     }
+
+    //printirame reda
+    std::cout << text << std::endl;
+    lineCounter++;
+
     return true;
 }
 
