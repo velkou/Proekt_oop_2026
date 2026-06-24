@@ -43,6 +43,7 @@ void Citizen::addMoney(unsigned amount, const std::string& currentDate)
     money += amount;
     std::string description = "Earned " + std::to_string(amount) + " money. New balance is: " + std::to_string(money); //to_string прави от инт string
 
+    ///LogEntry{..} създава безименен обект от тип LogEntry; Uniform Initialization -> Вика конструктора на класа LogEntry; Съществува, колкото да бъде подаден на вектора
     history.push_back(LogEntry{currentDate,description}); // добавябе записа в историята
 }
 
@@ -53,12 +54,12 @@ void Citizen::removeMoney(unsigned amount, const std::string& currentDate)
 
     std::string description = "Spent " + std::to_string(amount) + " money. New balance is: " + std::to_string(money); //to_string прави от инт string
 
-    history.push_back(LogEntry{currentDate,description}); // добавябе записа в историята // тук дали да бъде push_back или emplace_back
+    history.push_back(LogEntry{currentDate,description}); // добавябе записа в историята
 }
 
 void Citizen::changeHappiness(int amount, const std::string& currentDate)
 {
-    int newHappiness = static_cast<int>(happiness) + amount; //изчисляваме временно в инт, за да не превъртим unsigned
+    int newHappiness = static_cast<int>(happiness) + amount; ///изчисляваме временно в инт, за да не превъртим unsigned
     if (newHappiness > 100) newHappiness = 100;
     else if (newHappiness < 0)  newHappiness = 0;
 

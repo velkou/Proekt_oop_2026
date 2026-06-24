@@ -15,7 +15,8 @@ Cell::Cell(const Cell& other)
         building = nullptr;
 
     for (Citizen* citizen : other.citizens)
-        this->citizens.push_back(new Citizen(*citizen));//?
+        this->citizens.push_back(new Citizen(*citizen));
+    ///заделя се нова памет.Подавайки гражданина от other в скобите, извикваме копи конструктора на Citizen
 }
 
 Cell& Cell::operator=(const Cell& other)
@@ -147,8 +148,8 @@ void Cell::triggerDailyRoutine(unsigned day, const std::string& date, unsigned d
     {
         for (Citizen* citizen : citizens)
         {
-           citizen->changeHappiness(-20,date);
-            citizen->changeLifePoint(-20,date);
+           citizen->changeHappiness(-10,date);
+            citizen->changeLifePoint(-5,date);
 
             if (citizen->getMoney() >= 50)
             {
@@ -158,8 +159,8 @@ void Cell::triggerDailyRoutine(unsigned day, const std::string& date, unsigned d
             {
                 citizen->removeMoney(50,date);
                 //nakazanie za glad
-                citizen->changeHappiness(-25,date);
-                citizen->changeLifePoint(-30,date);
+                citizen->changeHappiness(-15,date);
+                citizen->changeLifePoint(-20,date);
             }
         }
     }

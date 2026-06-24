@@ -5,7 +5,7 @@
 #include "../Professions/Student.hpp"
 #include "../Professions/Teacher.hpp"
 #include "../Professions/Unemployed.hpp"
-
+///За логиките с четенето от входа съм си помагал с изкуствен интелект
 void CommandCenter::run()
 {
     std::cout << "The Matrix is a system, Neo. Enter a command from the list below to start your Matrix experience ^&^" << std::endl;
@@ -27,14 +27,16 @@ void CommandCenter::run()
                 int n, m;
                 std::cin >> n >> m;
 
-                if (n <= 0 || m <= 0)
-                    throw std::invalid_argument("City dimensions must be at least 1x1!");
-
+                //Ако въведем нещо което не е число влизаме тук
                 if (std::cin.fail())
                 {
                     clearInputStream();
                     throw std::invalid_argument("Coordinates must be positive numbers!");
                 }
+
+                if (n <= 0 || m <= 0)
+                    throw std::invalid_argument("City dimensions must be at least 1x1!");
+
                 map.generate((unsigned)n,(unsigned) m);
             }
             else if (command == "add")
@@ -49,8 +51,8 @@ void CommandCenter::run()
                     throw std::invalid_argument("Invalid input formats of add command!");
                 }
 
-                //validacii
-                if (x < 0 || y < 0)     ///???
+                //Валидации
+                if (x < 0 || y < 0)
                     throw std::invalid_argument("Coordinates cannot be negative numbers!");
                 if (happiness < 0 || happiness > 100 || life > 100 || life < 0)
                     throw std::invalid_argument("Happiness and life points must be between 0 and 100!");
@@ -70,9 +72,7 @@ void CommandCenter::run()
                 //dobavqme go v grada
                 try
                 {
-                    ///Ако addCitizen хвърли грешка (например "Сградата е пълна"),
-                    ///твоят try-catch улавя грешката,
-                    ///изтрива заделената памет за новия човек,
+                    ///Ако addCitizen хвърли грешка (например ако града е пълен) try catch-а улавя грешката изтрива заделената памет за новия човек,
                     ///за да няма Memory Leak, и препраща грешката нагоре.
                     map.addCitizen(x,y,newCitizen);
                     std::cout << "Citizen " << name << " added successfully!" << std::endl;
@@ -136,7 +136,7 @@ void CommandCenter::run()
             }
             else if (command == "exit")
             {
-                std::cout << "Do you want to save the current simulation before exiting? (y/n): ";
+                std::cout << "Do you want to save the current simulation before exiting? Press 'y' to save: ";
                 char answer;
                 std::cin >> answer;
                 if (answer == 'y' || answer == 'Y')
@@ -267,7 +267,7 @@ void CommandCenter::run()
 void CommandCenter::clearInputStream()
 {
     std::cin.clear();   //izchistva flaga za greshka
-    while (std::cin.get() != '\n' && !std::cin.eof()) {}//izhurlq ostatuka ot reda?
+    while (std::cin.get() != '\n' && !std::cin.eof()) {}//vzema sledvashtiq simvol ot bufera i go premahva
 }
 
 Profession* CommandCenter::createProfessionFromString(const std::string& str)

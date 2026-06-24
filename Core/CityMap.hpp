@@ -34,7 +34,7 @@ private:
     unsigned n, m;
     std::string startDate;
     std::string currentDate;
-    std::vector<std::vector<Cell>> grid; ///Матрица на града
+    std::vector<std::vector<Cell>> grid; ///Матрица на града, съставена от клетки
     std::vector<LogEntry> cityHistory; ///Хронологичният архив
     unsigned day, month, year;
 

@@ -38,7 +38,7 @@ void CityMap::generate(unsigned rows, unsigned cols)
     currentDate = "01.01.2026";
 
     grid.clear(); ///Прави grid празен
-    grid.resize(n,std::vector<Cell>(m)); ///n-новият размер,x:стойност,чрез която се инициализират допулнителни елементи от vector
+    grid.resize(n,std::vector<Cell>(m)); ///n-новият размер,x:стойност,чрез която се инициализират допулнителни елементи от vector; https://www.geeksforgeeks.org/cpp/vector-resize-c-stl/
 
     ///Запълване със случайни сгради и граждани
     for (size_t i = 0; i < n; ++i)
@@ -59,7 +59,7 @@ void CityMap::generate(unsigned rows, unsigned cols)
                     case BuildingType::Panel:
                         newBuilding = new Panel(maxCapacity); break;
                     case BuildingType::Dorm:
-                        newBuilding = new ModernBuilding(maxCapacity);
+                        newBuilding = new Dorm(maxCapacity);
                         isDorm = true; break;
                     default:
                         break; ///Ако по някаква причина type е None не правим нищо
@@ -74,7 +74,7 @@ void CityMap::generate(unsigned rows, unsigned cols)
                     std::string citName = randomNames[std::rand() % randomNames.size()] + "@" + std::to_string(std::rand() % 1000);
                     unsigned happiness = std::rand() % 101;
                     unsigned money = std::rand() % 3001;
-                    unsigned lifePoints = 50 + (std::rand() % 51); ///Живот между 50 и 100, за да не започват симулацията мъртви
+                    unsigned lifePoints = 70 + (std::rand() % 31); ///Живот между 70 и 100, за да не започват симулацията мъртви
 
                     Profession* citProf = nullptr;
                     if (isDorm)  citProf = new Student(); ///Тук сме в общак и задължително създаваме студент
@@ -90,7 +90,7 @@ void CityMap::generate(unsigned rows, unsigned cols)
 
                     Citizen* newCitizen = new Citizen(citName,citProf,happiness,money,lifePoints);
 
-                    delete citProf;///!
+                    delete citProf;///!, защото вече newCitizen си има копие
 
                     grid[i][j].addPerson(newCitizen);
                 }
@@ -99,17 +99,21 @@ void CityMap::generate(unsigned rows, unsigned cols)
     }
 
     std::string logDescr = "City generated: " + cityName + " with dimensions " + std::to_string(n) + "x" + std::to_string(m);
-    cityHistory.push_back(LogEntry(currentDate,logDescr));
+    cityHistory.push_back(LogEntry(currentDate,logDescr)); ///https://www.geeksforgeeks.org/cpp/vector-push-back-cpp-stl/
 
     std::cout << currentDate << std::endl;
 }
 
 void CityMap::addCitizen(unsigned x, unsigned y, Citizen* citizen)
 {
+    ///Предпазваме се от добавяне на хора, ако градът още не е генериран
+    if (grid.empty())
+        throw std::invalid_argument("The city has not been generated yet!");
+
     if (n <= x || m <= y) throw std::invalid_argument("Invalid coordinates");
 
-    Cell& targetCell = grid[x][y];
-    const Building* bldg = targetCell.getBuilding();
+    Cell& targetCell = grid[x][y]; ///това е клетката в която трябва сме по подадените координати
+    const Building* bldg = targetCell.getBuilding(); ///и съответната сграда в клетката
 
     if (bldg == nullptr)
         throw std::invalid_argument("No building at this location to move in!");
@@ -128,6 +132,9 @@ void CityMap::addCitizen(unsigned x, unsigned y, Citizen* citizen)
         }
     }
 
+    ///Цикъл през гражданите на съответната клетка
+    ///https://www.geeksforgeeks.org/cpp/range-based-loop-c/
+    ///By default, the loop variable stores a copy of each element.
     for (const Citizen* c : targetCell.getCitizens())
     {
         if (c->getName() == citizen->getName())
@@ -139,6 +146,8 @@ void CityMap::addCitizen(unsigned x, unsigned y, Citizen* citizen)
 
 void CityMap::removeCitizen(unsigned x, unsigned y, const std::string& name)
 {
+    if (grid.empty()) throw std::invalid_argument("The city has not been generated yet!");
+
     if (x >= n || y >= m ) throw std::invalid_argument("Invalid coordinates");
     grid[x][y].removePerson(name);
 }
@@ -151,6 +160,7 @@ void CityMap::step(int count)
         for (size_t i = 0; i < count; ++i)
             performSingleStep();
     }
+    ///Тук си помогнах с изкуствен интелект за undo логиката
     else
     {
         size_t stepsBack = -count;
@@ -163,11 +173,12 @@ void CityMap::step(int count)
 
         if (stepsBack > 0)
         {
-            ///Състоянието от миналото
-            CityMap past = historyOfStates[historyOfStates.size() - stepsBack];
+            ///Намираме точния момент в миналото, към който искаме да се върнем.
+            ///Създава се копие на старото състояние на града
+            CityMap past = historyOfStates[historyOfStates.size() - stepsBack]; //ако историята има 10 записа и искаме да се върнем 2 записа назад, вземаме индекс 8
 
             std::vector<CityMap> preservedHistory(historyOfStates.begin(), historyOfStates.end() - stepsBack);
-            ///Инициализира preservedHistory с данните от historyOfStates;https://www.geeksforgeeks.org/cpp/initialize-a-vector-in-cpp-different-ways/
+            ///Инициализира preservedHistory с данните от historyOfStates; Range Constructor ;https://www.geeksforgeeks.org/cpp/initialize-a-vector-in-cpp-different-ways/
             past.historyOfStates = preservedHistory;
 
             ///Заменяме текущия град с града от миналото
@@ -216,6 +227,8 @@ void CityMap::printCityInfo() const
 
 void CityMap::printLocationInfo(unsigned x, unsigned y) const
 {
+    if (grid.empty())
+        throw std::invalid_argument("The city has not been generated yet!");
     if (x >= n || y >= m)
     {
         std::cout << "Invalid coordinates!" << std::endl;
@@ -262,6 +275,8 @@ void CityMap::printLocationInfo(unsigned x, unsigned y) const
 
 void CityMap::printCitizenInfo(unsigned x, unsigned y, const std::string& name) const
 {
+    if (grid.empty())
+        throw std::invalid_argument("The city has not been generated yet!");
     if (x >= n || y >= m)
     {
         std::cout << "Invalid coordinates!" << std::endl;
@@ -350,6 +365,7 @@ void CityMap::printStatistics(const std::string& option) const
         printLine("Minimum: " + std::to_string(minVal),lines);
         printLine("Maximum: " + std::to_string(maxVal),lines);
     }
+    ///тук си помогнах с изкуствен интелект
     else if (option == "profession")
     {
         ///Когато вземем професията на даден жител претърсваме вектора с имената
@@ -525,6 +541,8 @@ void CityMap::printCityHistory() const
     unsigned lines = 0;
     if (!printLine("City history of " + cityName + ": ",lines)) return;
 
+    ///Iterate by Reference
+    ///modifying the original elements of the container
     for (const LogEntry& entry : cityHistory)
     {
         std::string logLine = "[" + entry.getDate() + "]" + entry.getDescription();

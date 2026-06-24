@@ -9,6 +9,7 @@ inline void writeString(std::ofstream& out, const std::string& str) {
     size_t len = str.size();
     out.write(reinterpret_cast<const char*>(&len), sizeof(len));
     if (len > 0) {
+        ///c_str() превръща стринг в масив от чарове като поставя терминираша 0 накрая
         out.write(str.c_str(), len); //pishem vuv faila;https://cplusplus.com/forum/beginner/166519/
     }
 }
