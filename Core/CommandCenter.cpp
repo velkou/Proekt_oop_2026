@@ -13,6 +13,7 @@ void CommandCenter::run()
               << "add; "
               << "remove; "
               << "step; "
+              << "load; "
               << "info; " << std::endl;
 
     std::string command;
@@ -49,7 +50,7 @@ void CommandCenter::run()
                 }
 
                 //validacii
-                if (x <= 0 || y <= 0)
+                if (x < 0 || y < 0)     ///???
                     throw std::invalid_argument("Coordinates cannot be negative numbers!");
                 if (happiness < 0 || happiness > 100 || life > 100 || life < 0)
                     throw std::invalid_argument("Happiness and life points must be between 0 and 100!");
@@ -93,7 +94,7 @@ void CommandCenter::run()
                     clearInputStream();
                     throw std::invalid_argument("Invalid input for remove!");
                 }
-                if (x <= 0 || y <= 0)
+                if (x < 0 || y < 0)
                     throw std::invalid_argument("Coordinates cannot be negative numbers");
 
                 map.removeCitizen((unsigned)x,(unsigned)y,name);
@@ -119,6 +120,19 @@ void CommandCenter::run()
                     }
                     map.step(count);
                }
+            }
+            else if (command == "load")
+            {
+                std::string filename;
+                std::cin >> filename;
+
+                if (std::cin.fail())
+                {
+                    clearInputStream();
+                    throw std::invalid_argument("Invalid filename!");
+                }
+
+                map.loadFromFile(filename);
             }
             else if (command == "exit")
             {
@@ -158,7 +172,7 @@ void CommandCenter::run()
                         throw std::invalid_argument("Invalid coordinates for info command!");
                     }
 
-                    if (x <= 0 || y <= 0)
+                    if (x < 0 || y < 0)
                         throw std::invalid_argument("Coordinates cannot be negative numbers!");
 
 

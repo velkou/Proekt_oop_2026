@@ -1,3 +1,7 @@
+/**
+* \mainpage City simulation Documentation
+ * \image html neo.jpeg "Welcome to the Matrix experience"
+ */
 #pragma once
 #include "../Buildings/Building.hpp"
 ///Клетка от градската решетка. Съдържа една сграда и жителите в нея

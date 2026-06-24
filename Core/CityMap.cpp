@@ -578,7 +578,7 @@ void CityMap::loadFromFile(const std::string& filename)
     std::ifstream in(filename, std::ios::binary);
     if (!in.is_open())
     {
-        std::cerr << "Error: Could not open file " << filename << " for loading!\n";
+        std::cerr << "Error: Could not load " << filename << std::endl;
         return;
     }
 
@@ -642,6 +642,9 @@ bool CityMap::printLine(const std::string& text, unsigned& lineCounter, unsigned
             return false;
 
         lineCounter = 0; //Нулираме брояча за следващата страница
+
+        //Гарантира, че следващият текст ще започне начисто от долния ред.
+        std::cout << std::endl;
     }
 
     ///Принтираме реда
@@ -665,17 +668,17 @@ void CityMap::performSingleStep()
     {
         for (size_t j = 0; j < m; ++j)
         {
-            ///Манхатън разстояние до центъра (n/2,m/2)
-            unsigned dist = std::abs((int)i - (int)(n/2)) + std::abs((int)j - (int)(m/2));
-
-            ///Ежедневие на граждани
-            grid[i][j].triggerDailyRoutine(day,currentDate,dist,n,m);
-
+            ///Първо извършваме месечните ефекти на гражданите
             if (day == 1)
             {
                 for (Citizen* c : grid[i][j].getCitizens())
                     c->triggerMonthlyEffects(currentDate);
             }
+
+            ///Манхатън разстояние до центъра (n/2,m/2)
+            unsigned dist = std::abs((int)i - (int)(n/2)) + std::abs((int)j - (int)(m/2));
+            ///И след това ежедневието на граждани
+            grid[i][j].triggerDailyRoutine(day,currentDate,dist,n,m);
 
             ///Проверка за умрели и тъжни
             std::vector<std::string> deadNames;

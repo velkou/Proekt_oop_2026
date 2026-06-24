@@ -92,7 +92,7 @@ void Citizen::triggerMonthlyEffects(const std::string& date)
 {
     if (prof != nullptr)
     {
-        prof->applyMonthlyEffects(*this);
+        prof->applyMonthlyEffects(*this,date);
         history.push_back(LogEntry{date,"Monthly effects applied"});
     }
 }
