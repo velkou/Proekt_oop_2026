@@ -48,23 +48,21 @@ void CityMap::generate(unsigned rows, unsigned cols)
             if ((std::rand() % 100) < 75) //davame 75% shans da se postroi sgrada v tazi kletka
             {
                 Building* newBuilding = nullptr;
-                unsigned buildingType = std::rand() % 3; ///0-moderna, 1-panelka, 2-obshtak
+                BuildingType type = static_cast<BuildingType>(std::rand() % 3); ///generirame samo: 0-moderna, 1-panelka, 2-obshtak
                 unsigned maxCapacity  = 5 + (std::rand() % 36); ///max kapacitet mejdu 5 i 40
-
                 bool isDorm = false; ///
 
-                if (buildingType == 0)
+                switch (type)
                 {
-                    newBuilding = new ModernBuilding(maxCapacity);
-                }
-                else if (buildingType == 1)
-                {
-                    newBuilding = new Panel(maxCapacity);
-                }
-                else
-                {
-                    newBuilding = new Dorm(maxCapacity);
-                    isDorm = true; ///zashtoto samo studenti mogat da jiveqt v obshtak
+                    case BuildingType::Modern:
+                        newBuilding = new ModernBuilding(maxCapacity); break;
+                    case BuildingType::Panel:
+                        newBuilding = new Panel(maxCapacity); break;
+                    case BuildingType::Dorm:
+                        newBuilding = new ModernBuilding(maxCapacity);
+                        isDorm = true; break;
+                    default:
+                        break; //ako po nqkakva prichina type e none ne pravim nishto
                 }
 
                 grid[i][j].build(newBuilding); ///postroqvame sgradata v kletkata
@@ -119,19 +117,14 @@ void CityMap::addCitizen(unsigned x, unsigned y, Citizen* citizen)
     {
         // ima li svobodno mqsto
         if (targetCell.getCitizens().size() >= bldg->getMaxCap())
-        {
             throw std::runtime_error("The building at this location is full!");
-        }
+
 
         //ako sgradata e obshtak ima li pravo choveka da e tam
-        //dynamic cast za da razberem dali bazovata sgrada e realno dorm
-        const Dorm* dorm = dynamic_cast<const Dorm*>(bldg);
-        if (dorm != nullptr)
+        if (bldg->getType() == BuildingType::Dorm)
         {
             if (!citizen->canLiveInDorm())
-            {
                 throw std::invalid_argument("Only students can live in a dorm!");
-            }
         }
     }
 
@@ -202,9 +195,13 @@ void CityMap::printCityInfo() const
 
             //razpoznavame i printirame tipa na sgradata
             std::string bldgType = "Unknown building";
-            if (dynamic_cast<const ModernBuilding*>(bldg)) bldgType = "Modern Building";
-            else if (dynamic_cast<const Panel*>(bldg)) bldgType = "Panel";
-            else if (dynamic_cast<const Dorm*>(bldg)) bldgType = "Dorm";
+            switch (bldg->getType())
+            {
+                case BuildingType::Modern: bldgType = "Modern Building"; break;
+                case BuildingType::Panel: bldgType = "Panel"; break;
+                case BuildingType::Dorm: bldgType = "Dorm"; break;
+                default: break;
+            }
 
             if (!printLine(bldgType + ":",lines)) return;
 
@@ -240,9 +237,13 @@ void CityMap::printLocationInfo(unsigned x, unsigned y) const
     if (!printLine("Location [" + std::to_string(x) + "][" + std::to_string(y) + "]",lines)) return;
 
     std::string bldgType = "Unknown";
-    if (dynamic_cast<const ModernBuilding*>(bldg)) bldgType = "Modern Building";
-    else if (dynamic_cast<const Panel*>(bldg)) bldgType = "Panel";
-    else if (dynamic_cast<const Dorm*>(bldg)) bldgType = "Dorm";
+    switch (bldg->getType())
+    {
+        case BuildingType::Modern: bldgType = "Modern Building"; break;
+        case BuildingType::Panel: bldgType = "Panel"; break;
+        case BuildingType::Dorm: bldgType = "Dorm"; break;
+        default: break;
+    }
 
     //otpechatvame broq na horata i kapaciteta
     std::string bldgInfo =  "Type: " + bldgType +
@@ -411,7 +412,7 @@ void CityMap::printStatistics(const std::string& option) const
         std::vector<std::string> bldgLocs;
         std::vector<unsigned> bldgLocCounts;
 
-        unsigned  totalBldgs = 0;
+        unsigned totalBldgs = 0;
 
         for (size_t i = 0; i < n; ++i)
         {
@@ -424,9 +425,13 @@ void CityMap::printStatistics(const std::string& option) const
                     totalBldgs++;
                     //proverka po tip
                     std::string currType = "Unknown";
-                    if (dynamic_cast<const ModernBuilding*>(bldg)) currType = "Modern building";
-                    else if (dynamic_cast<const Panel*>(bldg)) currType = "Panel";
-                    else if (dynamic_cast<const Dorm*>(bldg)) currType = "Dorm";
+                    switch (bldg->getType())
+                    {
+                        case BuildingType::Dorm: currType = "Dorm"; break;
+                        case BuildingType::Panel: currType = "Panel"; break;
+                        case BuildingType::Modern: currType = "Modern Building"; break;
+                        default: break;
+                    }
 
                     bool typeFound = false;
                     for (size_t k = 0; k < bldgTypes.size(); ++k)
