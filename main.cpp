@@ -1,5 +1,5 @@
 #include <iostream>
-#include "CommandCenter.hpp"
+#include "Core/CommandCenter.hpp"
 int main()
 {
     //inicializirame generatora na sluchaini chisla
