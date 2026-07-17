@@ -1,4 +1,5 @@
 #pragma once
+#include "../Buildings/Location.hpp"
 #include "../Entities/Citizen.hpp"
 #include "../Utilities/Enums.hpp"
 ///Абстрактен базов клас. Наследниците му изчисляват специфичните за тях данни
@@ -13,7 +14,7 @@ public:
     virtual void applyBuildingEffect(std::vector<Citizen*>& currentCitizens,unsigned dayOfMonth, const std::string& currentDate,
             unsigned distanceFromCenter, unsigned n, unsigned m);
 
-    float getRent(unsigned distanceFromCenter, unsigned n, unsigned m) const;
+    float getRent() const;
 
     unsigned getMaxCap() const { return maxCap; }
 
@@ -28,5 +29,6 @@ public:
 protected:
     float baseRent;
     unsigned maxCap;
+    Location* location;
     ///std::vector<Citizen*> listOfCitizens;
 };

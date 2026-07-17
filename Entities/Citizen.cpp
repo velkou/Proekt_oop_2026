@@ -57,7 +57,7 @@ void Citizen::removeMoney(unsigned amount, const std::string& currentDate)
     history.push_back(LogEntry{currentDate,description}); // добавябе записа в историята
 }
 
-void Citizen::changeHappiness(int amount, const std::string& currentDate)
+void Citizen:: changeHappiness(int amount, const std::string& currentDate)
 {
     int newHappiness = static_cast<int>(happiness) + amount; ///изчисляваме временно в инт, за да не превъртим unsigned
     if (newHappiness > 100) newHappiness = 100;

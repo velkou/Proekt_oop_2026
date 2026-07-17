@@ -52,8 +52,10 @@ void CityMap::generate(unsigned rows, unsigned cols)
                 unsigned maxCapacity  = 5 + (std::rand() % 36); ///Максимум капацитет между 5 и 40
                 bool isDorm = false;
 
-                switch (type)
+                try
                 {
+                    switch (type)
+                    {
                     case BuildingType::Modern:
                         newBuilding = new ModernBuilding(maxCapacity); break;
                     case BuildingType::Panel:
@@ -63,6 +65,12 @@ void CityMap::generate(unsigned rows, unsigned cols)
                         isDorm = true; break;
                     default:
                         break; ///Ако по някаква причина type е None не правим нищо
+                    }
+                }
+                catch (const std::exception& e)
+                {
+                    delete newBuilding;
+                    throw;
                 }
 
                 grid[i][j].build(newBuilding); ///Построяваме сградата в клетката
@@ -87,8 +95,17 @@ void CityMap::generate(unsigned rows, unsigned cols)
                         else if (profType == 3) citProf = new Unemployed();
                         else citProf = new Student();
                     }
-
-                    Citizen* newCitizen = new Citizen(citName,citProf,happiness,money,lifePoints);
+                    // Citizen* newCitizen = new Citizen(citName,citProf,happiness,money,lifePoints);
+                    Citizen* newCitizen = nullptr;
+                    try
+                    {
+                        newCitizen = new Citizen(citName,citProf,happiness,money,lifePoints);
+                    }
+                    catch (const std::exception& e)
+                    {
+                        delete citProf;
+                        throw;
+                    }
 
                     delete citProf;///!, защото вече newCitizen си има копие
 

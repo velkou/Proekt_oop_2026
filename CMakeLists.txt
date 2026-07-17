@@ -27,4 +27,12 @@ add_executable(proekt main.cpp
         Core/CommandCenter.hpp
         Utilities/Enums.hpp
         Utilities/BinaryUtils.hpp
+        Buildings/Location.cpp
+        Buildings/Location.hpp
+        Buildings/CentralLoc.cpp
+        Buildings/CentralLoc.hpp
+        Buildings/EndLoc.cpp
+        Buildings/EndLoc.hpp
+        Buildings/StandartLoc.cpp
+        Buildings/StandartLoc.hpp
 )

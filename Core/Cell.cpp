@@ -30,10 +30,7 @@ Cell& Cell::operator=(const Cell& other)
     return *this;
 }
 
-Cell::~Cell()
-{
-    free();
-}
+Cell::~Cell() { free(); }
 
 void Cell::addPerson(Citizen* person)
 {
@@ -68,10 +65,7 @@ void Cell::build(Building* newBuilding)
         throw std::runtime_error("Cannot build over an existing building!");
 }
 
-const Building* Cell::getBuilding() const
-{
-    return building;
-}
+const Building* Cell::getBuilding() const { return building; }
 
 void Cell::save(std::ofstream& out) const
 {

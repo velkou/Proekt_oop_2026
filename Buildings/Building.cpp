@@ -8,12 +8,12 @@ void Building::applyBuildingEffect(std::vector<Citizen*>& currentCitizens,unsign
     {
         if (citizen == nullptr) throw std::runtime_error("Nullptr citizen");
     }
-    /// ne znam vse oshte dali e hubavo zaradi bavene
+
     for (Citizen* citizen : currentCitizens)
     {
         if (dayOfMonth == 1)
         {
-            float currRent = getRent(distanceFromCenter,n,m);
+            float currRent = getRent();
             if (citizen->getMoney() >= currRent)
             {
                 citizen->removeMoney(currRent,currentDate);
@@ -39,18 +39,9 @@ void Building::applyBuildingEffect(std::vector<Citizen*>& currentCitizens,unsign
     }
 }
 
-float Building::getRent(unsigned distanceFromCenter, unsigned n, unsigned m) const
+float Building::getRent() const
 {
-    float limitCentral = std::min(n,m)/8.0f;
-    float limitEdge = 6 * std::min(n,m)/8.0f;
-
-    if (distanceFromCenter <= limitCentral)
-        return baseRent * 2.5;
-
-    if (distanceFromCenter > limitEdge)
-        return baseRent * 0.8;
-
-    return baseRent;
+    return location->calculateRent(baseRent);
 }
 
 void Building::save(std::ofstream& out) const
